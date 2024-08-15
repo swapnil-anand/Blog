@@ -1,6 +1,7 @@
 package com.techie.blog.controller;
 
 import com.techie.blog.dto.UserAddRequest;
+import com.techie.blog.exception.ApiRequestException;
 import com.techie.blog.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,10 +14,10 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @GetMapping(name = "/validate")
+    @RequestMapping(value = "/validate/{username}", method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
-    public boolean isValidUser(@PathVariable("userid") Long userId) {
-        return userService.isValidUser(userId);
+    public boolean isValidUser(@PathVariable("username") String username) {
+        return userService.isValidUser(username);
     }
 
     @PostMapping("/add")

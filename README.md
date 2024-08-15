@@ -1,2 +1,4 @@
 # Blog
-Demo Blog Api 
+
+* Spring Boot Application for Blog service
+* 

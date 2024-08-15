@@ -1,6 +1,7 @@
 package com.techie.blog.service.impl;
 
 import com.techie.blog.dto.*;
+import com.techie.blog.exception.ApiRequestException;
 import com.techie.blog.model.Blog;
 import com.techie.blog.model.Comments;
 import com.techie.blog.model.User;
@@ -10,6 +11,7 @@ import com.techie.blog.repository.UserRepository;
 import com.techie.blog.service.BlogService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -34,10 +36,9 @@ public class BlogServiceImpl implements BlogService {
 
         Optional<User> user = this.userRepository.findById(blogPost.getUserId());
 
-        if (user.isEmpty()) {
-            log.info("User Not Found for User id: {}", blogPost.getUserId());
-            return false;
-        }
+        if (user.isEmpty())
+            throw new ApiRequestException("No User Found for User Id: " + blogPost.getUserId());
+
 
         Blog blogModel = new Blog();
         blogModel.setBlogContent(blogPost.getBlogContent());
@@ -57,10 +58,9 @@ public class BlogServiceImpl implements BlogService {
     @Override
     public boolean addCommentToPostByPostId(BlogCommentPost blogCommentPost) {
         Optional<Blog> blog = this.blogRepository.findById(blogCommentPost.getBlogId());
-        if (blog.isEmpty()) {
-            log.info("Blog Not Present with Blog id {}", blogCommentPost.getBlogId());
-            return false;
-        }
+        if (blog.isEmpty())
+            throw new ApiRequestException("No Blog Exists for id " + blogCommentPost.getBlogId(), HttpStatus.NOT_FOUND);
+
 
         Comments comments = new Comments();
         comments.setComment(blogCommentPost.getComments());
@@ -80,7 +80,7 @@ public class BlogServiceImpl implements BlogService {
         Optional<User> user = this.userRepository.findById(userId);
 
         if (user.isEmpty())
-            throw new IllegalStateException("No User found!");
+            throw new ApiRequestException("No User found!", HttpStatus.NOT_FOUND);
 
         Set<Blog> blogSet = user.get().getBlogList();
 
